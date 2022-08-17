@@ -1,0 +1,44 @@
+version: "3.7"
+
+services:
+  backend:
+    build: ./monika_backend
+    ports:
+      - "5000:8000"
+    volumes:
+      - ./monika_backend:/usr/src/app
+    depends_on:
+      - postgres
+      - fief
+  postgres:
+    image: "postgres:alpine"
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+  fief:
+    image: "ghcr.io/fief-dev/fief:latest"
+    ports:
+      - 9000:9000
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_TYPE: POSTGRESQL
+      DATABASE_HOST: postgres
+      DATABASE_PORT: ${DB_PORT}
+      DATABASE_USERNAME: ${DB_USER}
+      DATABASE_PASSWORD: ${DB_PASSWORD}
+      DATABASE_NAME: ${DB_NAME}
+      SECRET: ${FIEF_SECRET}
+      FIEF_CLIENT_ID: ${FIEF_CLIENT_ID}
+      FIEF_CLIENT_SECRET: ${FIEF_CLIENT_SECRET}
+      ENCRYPTION_KEY: ${FIEF_ENCRYPTION_KEY}
+      PORT: 9000
+      ROOT_DOMAIN: "localhost:9000"
+      FIEF_DOMAIN: "localhost:9000"
+      CSRF_COOKIE_SECURE: 0
+      LOGIN_SESSION_COOKIE_SECURE: 0
+      SESSION_COOKIE_SECURE: 0
+      FIEF_ADMIN_SESSION_COOKIE_SECURE: 0
